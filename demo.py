@@ -15,7 +15,7 @@
 # Contact: ps-license@tuebingen.mpg.de
 
 import os
-os.environ['PYOPENGL_PLATFORM'] = 'egl'
+os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
 
 import cv2
 import time

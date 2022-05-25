@@ -15,7 +15,7 @@
 # Contact: ps-license@tuebingen.mpg.de
 
 import os
-os.environ['PYOPENGL_PLATFORM'] = 'egl'
+os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
 
 import torch
 import pprint
@@ -89,6 +89,7 @@ def main(cfg):
     else:
         print(f'{cfg.TRAIN.PRETRAINED} is not a pretrained model!!!!')
 
+    # 生成器优化器
     gen_optimizer = get_optimizer(
         model=generator,
         optim_type=cfg.TRAIN.GEN_OPTIM,
@@ -97,6 +98,7 @@ def main(cfg):
         momentum=cfg.TRAIN.GEN_MOMENTUM,
     )
 
+    # 运动鉴别器
     motion_discriminator = MotionDiscriminator(
         rnn_size=cfg.TRAIN.MOT_DISCR.HIDDEN_SIZE,
         input_size=69,
@@ -108,6 +110,7 @@ def main(cfg):
         attention_dropout=None if cfg.TRAIN.MOT_DISCR.FEATURE_POOL !='attention' else cfg.TRAIN.MOT_DISCR.ATT.DROPOUT
     ).to(cfg.DEVICE)
 
+    # 鉴别器优化器
     dis_motion_optimizer = get_optimizer(
         model=motion_discriminator,
         optim_type=cfg.TRAIN.MOT_DISCR.OPTIM,
@@ -116,6 +119,7 @@ def main(cfg):
         momentum=cfg.TRAIN.MOT_DISCR.MOMENTUM
     )
 
+    # 学习率调整器
     motion_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         dis_motion_optimizer,
         mode='min',

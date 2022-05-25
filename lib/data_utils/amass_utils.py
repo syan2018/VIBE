@@ -33,22 +33,28 @@ joints_to_use = np.array([
 ])
 joints_to_use = np.arange(0,156).reshape((-1,3))[joints_to_use].reshape(-1)
 
+# all_sequences = [
+#     'ACCAD',
+#     'BioMotionLab_NTroje',
+#     'CMU',
+#     'EKUT',
+#     'Eyes_Japan_Dataset',
+#     'HumanEva',
+#     'KIT',
+#     'MPI_HDM05',
+#     'MPI_Limits',
+#     'MPI_mosh',
+#     'SFU',
+#     'SSM_synced',
+#     'TCD_handMocap',
+#     'TotalCapture',
+#     'Transitions_mocap',
+# ]
+
 all_sequences = [
     'ACCAD',
-    'BioMotionLab_NTroje',
+    'DanceDB',
     'CMU',
-    'EKUT',
-    'Eyes_Japan_Dataset',
-    'HumanEva',
-    'KIT',
-    'MPI_HDM05',
-    'MPI_Limits',
-    'MPI_mosh',
-    'SFU',
-    'SSM_synced',
-    'TCD_handMocap',
-    'TotalCapture',
-    'Transitions_mocap',
 ]
 
 def read_data(folder, sequences):
@@ -93,10 +99,15 @@ def read_single_sequence(folder, seq_name, fps=25):
             
             if fname.endswith('shape.npz'):
                 continue
+
+            if fname.endswith('stagei.npz'):
+                continue
                 
             data = np.load(fname)
+            # print(data.__dict__)
+
+            mocap_framerate = int(data['mocap_frame_rate'])
             
-            mocap_framerate = int(data['mocap_framerate'])
             sampling_freq = mocap_framerate // fps
             pose = data['poses'][0::sampling_freq, joints_to_use]
 
@@ -124,7 +135,7 @@ def read_seq_data(folder, nsubjects, fps):
 
         for action in actions:
             data = np.load(osp.join(folder, subject, action))
-            mocap_framerate = int(data['mocap_framerate'])
+            mocap_framerate = int(data['mocap_frame_rate'])
             sampling_freq = mocap_framerate // fps
             sequences[(subject, action)] = data['poses'][0::sampling_freq, joints_to_use]
 
